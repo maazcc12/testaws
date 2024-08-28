@@ -40,3 +40,4 @@ jobs:
         aws_region: us-east-1
         function_name: testapi
         zip_file: function.zip
+        debug: true
