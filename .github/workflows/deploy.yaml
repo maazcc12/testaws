@@ -27,7 +27,7 @@ jobs:
       run: |
         mkdir -p package
         pip install -r requirements.txt --target package/
-        cp -r . package/
+        cp -r $(ls -A | grep -v package) package/
         cd package
         zip -r9 ../function.zip .
         cd ..
@@ -40,4 +40,3 @@ jobs:
         aws_region: us-east-1
         function_name: arn:aws:lambda:us-east-1:226401266262:function:testapi
         zip_file: function.zip
-
