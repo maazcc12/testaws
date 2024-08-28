@@ -3,48 +3,41 @@ name: Deploy FastAPI to AWS Lambda
 on:
   push:
     branches:
-      - main  # Deploy only when the main branch is pushed
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: env  # Specify the environment name
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Install AWS CLI v2 on Ubuntu
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+    - name: Package application for AWS Lambda
+      run: |
+        mkdir -p package
+        pip install -r requirements.txt --target package/
+        cp -r . package/
+        cd package
+        zip -r9 ../function.zip .
+        cd ..
 
-      - name: Package application
-        run: |
-          mkdir -p package
-          pip install --target ./package -r requirements.txt
-          cp -r $(ls | grep -v package) ./package/
-          cd package && zip -r9 ../deploy.zip .
-
-      - name: Deploy to AWS Lambda
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Accessing secrets from environment
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Accessing secrets from environment
-          AWS_DEFAULT_REGION: us-east-1
-        run: |
-          aws lambda update-function-code \
-            --function-name arn:aws:lambda:us-east-1:226401266262:function:testapi \
-            --zip-file fileb://deploy.zip
-
+    - name: Deploy to AWS Lambda
+      uses: appleboy/lambda-action@v0.1.4
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: us-east-1
+        function_name: arn:aws:lambda:us-east-1:226401266262:function:testapi
+        zip_file: function.zip
 
