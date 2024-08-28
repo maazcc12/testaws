@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p package
           pip install --target ./package -r requirements.txt
-          cp -r ./* ./package
+          cp -r $(ls | grep -v package) ./package/
           cd package && zip -r9 ../deploy.zip .
 
       - name: Deploy to AWS Lambda
@@ -40,3 +40,4 @@ jobs:
           aws lambda update-function-code \
             --function-name arn:aws:lambda:us-east-1:226401266262:function:testapi \
             --zip-file fileb://deploy.zip
+
