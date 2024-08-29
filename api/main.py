@@ -18,3 +18,7 @@ async def intro():
 async def test():
     return {"output": "test"}
 
+
+@app.post('/test_hello')
+async def test_a():
+    return {"output":"abc"}
