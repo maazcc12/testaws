@@ -34,7 +34,7 @@ jobs:
         run: python -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
 
       - name: Create archive of dependencies
-        run: /
+        run: |
           cd ./venv/lib/python3.12/site-packages
           zip -r9 ../../../../api.zip
       - name: Add API Files to zip file
