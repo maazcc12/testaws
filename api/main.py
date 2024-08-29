@@ -8,6 +8,7 @@ handler = Mangum(app)
 async def greet():
     return {"output":"Hello"}
 
+
 @app.post('/bye')
 async def intro():
     return {"output":"bye"}
